@@ -1,0 +1,48 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+
+int main()
+
+{
+     //Function 1: input variables
+//Defined Variables
+
+        double F;
+        double windspeed;
+        double dewpoint;
+
+    //Input your temperature in degrees Fahrenheit
+
+        cout<< "\n Welcome to Martinothegoat's Weather Program.\n\n     This Program will help determine wind chill and the \n      cloud base using the dew point in fahrenheit.\n\n           Please start by inputing the Temperature, we don't need the unit.\n"<< endl;
+        cout<<"           ";
+        cin >>F;
+
+    //Input your windspeed in miles per hour
+
+        cout<< "\n\n\n           Okay, " <<F <<" Degrees Fahrenheit? If not, please restart the program and put temperature again.\n           Now please input your windspeed in miles per hour...\n"<<endl;
+        cout<<"           ";
+        cin >> windspeed;
+
+    //Input your dew point in degrees fahrenheit
+
+        cout<<"\n\n\n           Okay, " <<windspeed <<" miles per hour? If not try restarting the program and putting your temperature and windspeed again.\n           Now please input your dew point in degrees fahrenheit"<<endl;
+        cout<<"           ";
+        cin >> dewpoint;
+
+
+        //Function 2: Determine wind chill
+        //Uses these two functions to calculate windchill
+
+        double computedWindchill = 35.74 + ((0.6215 * F) - (35.75 * (pow(windspeed, 0.16)))) + (0.4275 * F * (pow(windspeed, 0.16)));
+
+        cout<< "\n\n\n           Okay, " <<dewpoint <<" Degrees Fahrenheit? If not try restarting the program and putting all your numbers again.\n           Here's a table for all your data and integers."<<endl;
+
+        //Function 3: The Table
+        //REMEMBER TO MAKE THE FUNCTIONS BEFORE YOU TURN IN THE PROJECT
+
+
+    return 0;
+}
