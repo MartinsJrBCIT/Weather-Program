@@ -22,7 +22,7 @@ void inputvariables(double &F, double &windspeed, double &dewpoint, double &comp
     cout << "           ";
     cin >> F;
 
-    // Use the boolean function nonintegerfix to correct false numeric values
+    // Use the function nonintegerfix to correct false numeric values
     while (!nonintegerfix(F)) {
         cout << "     Please enter a valid temperature (an integer, you're not required to place a unit): " << endl;
         cout << "\n     ";
@@ -56,7 +56,7 @@ void inputvariables(double &F, double &windspeed, double &dewpoint, double &comp
     computedCloudbase = ((F - dewpoint) / 4.4) * 1000;
 }
 
-// Function for outputting the table of data
+// Function for showing data table
 void thetable(double F, double windspeed, double dewpoint, double computedWindchill, double computedCloudbase) {
     cout << "\n\n                         YOUR DATA                      " << endl;
     cout << "----------------------------------------------------------" << endl;
@@ -68,7 +68,7 @@ void thetable(double F, double windspeed, double dewpoint, double computedWindch
 }
 
 int main() {
-    // Declare the variables to hold input and calculated values
+    // declared variables
     double F, windspeed, dewpoint, computedWindchill, computedCloudbase;
 
     // Call the function to input data and calculate results
