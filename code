@@ -1,274 +1,410 @@
 #include <iostream>
-#include <cmath>
+#include <string>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
-// Function asks user to input if the males colorblind or not.
- void inputCB(double &maleans, double &cbans);
-
- //Function continues code scenario if male is chosen
- void MALENORM(double &cbans);
-
-//Function continues code scenario if female is chosen
- void MALECB(double &cbans);
-
- //Function for a punnett square where the male & female have normal vision
- void PS1();
-
- //Function for a punnett square where the male has normal vision but the female is colorblind
- void PS2();
-
- //Function for a punnett square where the male has normal vision but the female is a silent carrier
- void PS3();
-
- //Function for a punnett square where the male is colorblind but the female has normal vision
- void PS4();
-
- //Function for a punnett square where the male and female is colorblind
- void PS5();
-
- //Function for a punnett square where the male is colorblind but the female is a silent carrier
- void PS6();
+void PLAYTITLE();
+int getNumberOfPlayers();
+void GAMESTART(int numPlayers);
+void delay(int seconds);
+void FirstRound(int numPlayers, string deck[], int playerPoints[]);
+int CHOOSEYOURCARD(string playerHand[], int handSize);
+void shuffleDeck(string deck[], int size);
+int determineWinner(string playedCards[], int numPlayers);
+void OtherRounds(int numPlayers, string deck[], int playerPoints[]);
 
 
-int main()
-{
+int main() {
 
-    //Defined variables:
-    double maleans, cbans;
+   // Seed the random number generator
+    srand((unsigned int)time(0));
 
-    cout<< "\n                              Welcome to Martinothegoat's Colorblind Genetics Program.\n\n                This program will use genetic data to figure out the possible inheritance of children.\n\n                 Please start by selecting the options and we'll create the possible scenarios for you!"<<endl;
-     cout<<"       __________________________________________________________________________________________________________"<<endl;
-    inputCB(maleans, cbans);
+    PLAYTITLE();
+    cout << "\nPress Enter to start the game..." << endl;
+
+    // Wait for the user to press Enter
+    cin.ignore(); // Clears the input buffer and waits for Enter
+
+    cout << "Starting the game..." << endl;
+
+    // Wait for 2 seconds
+    delay(2);
+
+    // Get the number of players
+    int numPlayers = getNumberOfPlayers();
+
+    // Start the game with the specified number of players
+    GAMESTART(numPlayers);
 
     return 0;
 }
 
+void PLAYTITLE() {
+    cout << "Welcome to...\n\n\n" << endl;
+    cout << " .----------------.  .----------------.  .----------------.  .----------------.  .----------------. " << endl;
+    cout << "| .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |" << endl;
+    cout << "| |    ______    | || | _____  _____ | || |  _______     | || |  ___  ____   | || |      __      | |" << endl;
+    cout << "| |  .' ___  |   | || ||_   _||_   _|| || | |_   __ \\    | || | |_  ||_  _|  | || |     /  \\     | |" << endl;
+    cout << "| | / .'   \\_|   | || |  | |    | |  | || |   | |__) |   | || |   | |_/ /    | || |    / /\\ \\    | |" << endl;
+    cout << "| | | |    ____  | || |  | '    ' |  | || |   |  __ /    | || |   |  __'.    | || |   / ____ \\   | |" << endl;
+    cout << "| | \\ `.___]  _| | || |   \\ `--' /   | || |  _| |  \\ \\_  | || |  _| |  \\ \\_  | || | _/ /    \\ \\_ | |" << endl;
+    cout << "| |  `._____.'   | || |    `.__.'    | || | |____| |___| | || | |____||____| | || ||____|  |____|| |" << endl;
+    cout << "| |              | || |              | || |              | || |              | || |              | |" << endl;
+    cout << "| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |" << endl;
+    cout << " '----------------'  '----------------'  '----------------'  '----------------'  '----------------' " << endl;
 
+    cout << "Welcome to the card game against AI!" << endl;
+    cout << "Each player is dealt 6 cards from a shuffled deck of 52 cards." << endl;
+    cout << "Players take turns starting with the dealer's left." << endl;
+    cout << "The goal is to have the lowest card when everyone is down to their last card." << endl;
+    cout << "Players can match or play a higher card; if unable, they must play their lowest card." << endl;
+    cout << "The winner of each round starts the next round by playing any card of their choice." << endl;
+    cout << "The game continues for 4 rounds, and the player with the lowest card at the end wins!" << endl;
+    cout << "No cheating! Have fun!" << endl;
+}
 
+int getNumberOfPlayers() {
+    int numPlayers;
+    do {
+        cout << "Enter the number of players (2-4): ";
+        cin >> numPlayers;
+        if (numPlayers < 2 || numPlayers > 4) {
+            cout << "Invalid number of players. Please enter a value between 2 and 4." << endl;
+        }
+    } while (numPlayers < 2 || numPlayers > 4);
+    return numPlayers;
+}
 
-void inputCB(double &maleans, double &cbans){
-    cout << "\n                                      *Use 1 and 2 to answer initial questions*" <<endl;
-    cout << "\n                                         First, state the male's genetic eye condition..." <<endl;
-    cout << "     (1) Normal Vision\n     (2) Colorblind" <<endl;
+void GAMESTART(int numPlayers) {
+    int playerPoints[4] = {0}; // Array to store points for each player
 
-    cin >> maleans;
+    cout << "Game has started with " << numPlayers << " players!\n" << endl;
 
-while (true){
- //This determines allowed integers or not
+    // Array of all 52 cards in a French-suited deck
+string cards[] = {
 
+    "Card: 2 of Diamonds", "Card: 2 of Clubs", "Card: 2 of Hearts", "Card: 2 of Spades",
+    "Card: 3 of Diamonds", "Card: 3 of Clubs", "Card: 3 of Hearts", "Card: 3 of Spades",
+    "Card: 4 of Diamonds", "Card: 4 of Clubs", "Card: 4 of Hearts", "Card: 4 of Spades",
+    "Card: 5 of Diamonds", "Card: 5 of Clubs", "Card: 5 of Hearts", "Card: 5 of Spades",
+    "Card: 6 of Diamonds", "Card: 6 of Clubs", "Card: 6 of Hearts", "Card: 6 of Spades",
+    "Card: 7 of Diamonds", "Card: 7 of Clubs", "Card: 7 of Hearts", "Card: 7 of Spades",
+    "Card: 8 of Diamonds", "Card: 8 of Clubs", "Card: 8 of Hearts", "Card: 8 of Spades",
+    "Card: 9 of Diamonds", "Card: 9 of Clubs", "Card: 9 of Hearts", "Card: 9 of Spades",
+    "Card: 10 of Diamonds", "Card: 10 of Clubs", "Card: 10 of Hearts", "Card: 10 of Spades",
+    "King (Spade)", "King (Diamond)", "King (Club)", "King (Heart)",
+    "Queen (Spade)", "Queen (Diamond)", "Queen (Club)", "Queen (Heart)",
+    "Jack (Spade)", "Jack (Diamond)", "Jack (Club)", "Jack (Heart)",
+    "Ace (Spade)", "Ace (Diamond)", "Ace (Club)", "Ace (Heart)"
+};
+string deck[52];
 
-
-            if (maleans != 1 && maleans != 2) {
-    cin.clear();
-    cin.ignore(10000, '\n');
-    cout << "\n                                      *USE 1 AND 2 ONLY TO ANSWER THESE QUESTIONS*" <<endl;
-    cout << "\n                                         First, state the male's genetic eye condition..." <<endl;
-    cout << "     (1) Normal Vision\n     (2) Colorblind" <<endl;
-    cin >> maleans;
+// Populate the deck
+int index = 0;
+for (int i = 0; i < 4; i++) { 
+    for (int j = 0; j < 13; j++) { 
+        deck[index++] = cards[i * 13 + j]; 
+    }
 }
 
 
-        if (maleans == 1){
+    shuffleDeck(deck, 52);
 
-        cout << "\nSelected Normal Vision" <<endl;
-        MALENORM(cbans);
-        break;
-    }
-    else if (maleans == 2){
+    cout << "Game starting in 3..." << endl;
+    delay(1);
+    cout << "                 2..." << endl;
+    delay(1);
+    cout << "                 1..." << endl;
+    delay(2);
+    cout << "             Game starting!" << endl;
+    delay(2);
+     system("cls");
+      cout << "\n\n" << endl;
+    cout << " .----------------.  .----------------.  .----------------.  .----------------.  .----------------. " << endl;
+    cout << "| .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |" << endl;
+    cout << "| |    ______    | || | _____  _____ | || |  _______     | || |  ___  ____   | || |      __      | |" << endl;
+    cout << "| |  .' ___  |   | || ||_   _||_   _|| || | |_   __ \\    | || | |_  ||_  _|  | || |     /  \\     | |" << endl;
+    cout << "| | / .'   \\_|   | || |  | |    | |  | || |   | |__) |   | || |   | |_/ /    | || |    / /\\ \\    | |" << endl;
+    cout << "| | | |    ____  | || |  | '    ' |  | || |   |  __ /    | || |   |  __'.    | || |   / ____ \\   | |" << endl;
+    cout << "| | \\ `.___]  _| | || |   \\ `--' /   | || |  _| |  \\ \\_  | || |  _| |  \\ \\_  | || | _/ /    \\ \\_ | |" << endl;
+    cout << "| |  `._____.'   | || |    `.__.'    | || | |____| |___| | || | |____||____| | || ||____|  |____|| |" << endl;
+    cout << "| |              | || |              | || |              | || |              | || |              | |" << endl;
+    cout << "| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |" << endl;
+    cout << " '----------------'  '----------------'  '----------------'  '----------------'  '----------------' " << endl;
+    cout << "\n\n" << endl;
+    cout << "Game has started with " << numPlayers << " players!\n" << endl;
+    // Call the FirstRound function
+    FirstRound(numPlayers, deck, playerPoints);
+}
 
-        cout << "\nSelected Colorblindness" <<endl;
-        MALECB(cbans);
-        break;
+void FirstRound(int numPlayers, string deck[], int playerPoints[]) {
+    string playerHand[6]; // Array to store the first player's hand
+    string aiHands[4][6]; // 2D array to store the hands of up to 4 AI players
+    string aiPlayedCards[4]; // Array to store the cards played by AI players
+    int deckIndex = 0;       // Index to track cards dealt from the deck
+
+    // Loop through each player to deal cards
+    for (int player = 1; player <= numPlayers; player++) {
+        cout << "Player " << player;
+        if (player == 1) {
+            cout << " (You)";
+        }
+        cout << " draws: " << endl;
+        delay(1);
+
+        // Determine the number of cards each player gets
+        int cardsToDraw = 6;
+
+
+        // Assign cards to the current player
+        for (int card = 0; card < cardsToDraw; card++) {
+            if (deckIndex >= 52) {
+                cout << "No more cards left in the deck!" << endl;
+                return; // Exit if there are no more cards
+            }
+
+            if (player == 1) {
+                playerHand[card] = deck[deckIndex]; // Store cards in the player's hand
+            } else {
+                aiHands[player - 2][card] = deck[deckIndex]; // Store cards in the AI player's hand
+            }
+            cout << deck[deckIndex];
+            if (card < cardsToDraw - 1) cout << ", "; // Add a comma between cards
+            deckIndex++; // Move to the next card in the deck
+        }
+        cout << endl;
+
+        delay(1);
     }
+
+    // Simulate AI players' actions (choose cards but don't reveal yet)
+    for (int player = 2; player <= numPlayers; player++) {
+        cout << "AI Player " << player << " is thinking...\n";
+        delay(1);
+
+        // AI picks a random card from their hand
+        int aiCardIndex = rand() % 6; // AI has 6 cards
+        aiPlayedCards[player - 2] = aiHands[player - 2][aiCardIndex]; // Store the chosen card
+        cout << "AI Player " << player << " has chosen their card.\n";
+        delay(1);
+    }
+
+    // Player's turn: Choose and show their card
+    cout << "\nYour turn! Choose which card to play:\n";
+    int chosenCardIndex = CHOOSEYOURCARD(playerHand, 6);
+    cout << "You played: " << playerHand[chosenCardIndex] << endl;
+
+    delay(2);
+
+    // Reveal the AI players' chosen cards
+    cout << "\nLets see how you did against AI!\n\n";
+    for (int player = 2; player <= numPlayers; player++) {
+        cout << "AI Player " << player << " played: " << aiPlayedCards[player - 2] << endl;
+        delay(1);
+    }
+
+    // After all players have chosen their cards
+
+string playedCards[4]; // Array to store the played cards
+
+// Store the human player's card
+playedCards[0] = playerHand[chosenCardIndex];
+
+// Store the AI players' cards
+for (int i = 1; i < numPlayers; i++) {
+    playedCards[i] = aiPlayedCards[i - 1];
 
 }
 
-    }
+    int winner = determineWinner(playedCards, numPlayers);
+    playerPoints[winner]++; // Increment the winner's points
 
-    void MALENORM(double &cbans){
-
-
-        cout <<"\n                                  Okay, now state the female's genetic eye condition. \n\n                             A third option is represented for the chance of you know she is a silent carrier..." <<endl;
-        cout << "     (1) Not Colorblind\n     (2) Colorblind\n     (3) Silent Carrier" <<endl;
-         cin>> cbans;
-
-         while(true){
-
-                    if (cbans != 1 && cbans != 2 && cbans != 3) {
-    cin.clear();
-    cin.ignore(10000, '\n');
-    cout << "\n                                      *USE 1 AND 2 ONLY TO ANSWER THESE QUESTIONS*" <<endl;
-    cout << "\n                                         State the female's genetic eye condition..." <<endl;
-    cout <<  "     (1) Not Colorblind\n     (2) Colorblind\n     (3) Silent Carrier" <<endl;
-    cin >> cbans;
+    cout << "Player " << (winner + 1) << " now has " << playerPoints[winner] << " points." << endl;
 }
 
-
-
-        if (cbans == 1){
-
-        cout << "Selected Not Colorblind" <<endl;
-        PS1();
-        break;
+void delay(int seconds) {
+    clock_t start_time = clock();
+    while (clock() < start_time + seconds * CLOCKS_PER_SEC) {
+        // Busy-wait loop
     }
-    else if (cbans == 2){
-
-        cout << "Selected Colorblind" <<endl;
-        PS2();
-        break;
-    }
-
-    else if (cbans == 3){
-
-        cout << "Selected Silent Carrier" <<endl;
-        PS3();
-        break;
-    }
-
-
-
-
-    }
-    }
-
-    void PS1(){
-        cout << "\n   Okay, heres the punnett square:\n"<<endl;
-        cout <<" --------------------------------"<<endl;
-        cout <<"| PUNNET  |           |          |"<<endl;
-        cout <<"| SQUARE  |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<" -------------------------------- "<<endl;
-        cout <<"\n    Now here's a Phenotype for you to easily digest the information given:\n"<<endl;
-    }
-
-    void PS2 (){
-
-        cout << "\n   Okay, heres the punnett square:\n"<<endl;
-        cout <<" --------------------------------"<<endl;
-        cout <<"| PUNNET  |           |          |"<<endl;
-        cout <<"| SQUARE  |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<" -------------------------------- "<<endl;
-        cout <<"\n    Now here's a Phenotype for you to easily digest the information given:\n"<<endl;
-    }
-
-    void PS3(){
-
-        cout << "\n   Okay, heres the punnett square:\n"<<endl;
-        cout <<" --------------------------------"<<endl;
-        cout <<"| PUNNET  |           |          |"<<endl;
-        cout <<"| SQUARE  |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<" -------------------------------- "<<endl;
-        cout <<"\n    Now here's a Phenotype for you to easily digest the information given:\n"<<endl;
-
-    }
-    void MALECB(double &cbans){cout <<"\n                                  Okay, now state the female's genetic eye condition. \n\n                             A third option is represented for the chance of you know she is a silent carrier..." <<endl;
-        cout << "     (1) Not Colorblind\n     (2) Colorblind\n     (3) Silent Carrier" <<endl;
-         cin>> cbans;
-
-         while(true){
-
-                    if (cbans != 1 && cbans != 2 && cbans != 3) {
-    cin.clear();
-    cin.ignore(10000, '\n');
-    cout << "\n                                      *USE 1 AND 2 ONLY TO ANSWER THESE QUESTIONS*" <<endl;
-    cout << "\n                                         State the female's genetic eye condition..." <<endl;
-    cout <<  "     (1) Not Colorblind\n     (2) Colorblind\n     (3) Silent Carrier" <<endl;
-    cin >> cbans;
 }
 
+int CHOOSEYOURCARD(string playerHand[], int handSize) {
+    int cardChoice;
 
-
-        if (cbans == 1){
-
-        cout << "Selected Not Colorblind" <<endl;
-        PS4();
-        break;
-    }
-    else if (cbans == 2){
-
-        cout << "Selected Colorblind" <<endl;
-        PS5();
-        break;
+    // Display the player's hand
+    cout << "\nYour cards are:" << endl;
+    for (int i = 0; i < handSize; i++) {
+        cout << i + 1 << ": " << playerHand[i] << endl; // Show card index starting from 1
     }
 
-    else if (cbans == 3){
+    // Prompt the player to choose a card
+    do {
+        cout << "Choose a card to play (1-" << handSize << "): ";
+        cin >> cardChoice;
 
-        cout << "Selected Silent Carrier" <<endl;
-        PS6();
-        break;
+        if (cardChoice < 1 || cardChoice > handSize) {
+            cout << "Invalid choice. Please choose a valid card number." << endl;
+        }
+    } while (cardChoice < 1 || cardChoice > handSize);
+
+    // Return the index of the chosen card (adjusted for 0-based indexing)
+    return cardChoice - 1;
+
+    
+}
+
+void shuffleDeck(string deck[], int size) {
+    for (int i = size - 1; i > 0; i--) {
+        int j = rand() % (i + 1); // Generate a random index
+        swap(deck[i], deck[j]);  // Swap the current card with a random card
     }
+}
+
+int determineWinner(string playedCards[], int numPlayers) {
+     int cardValues[4];
+
+
+    for (int i = 0; i < numPlayers; i++) {
+        if (
+            playedCards[i] == "Card: 2 of Diamonds" ||
+            playedCards[i] == "Card: 2 of Clubs" ||
+            playedCards[i] == "Card: 2 of Hearts" ||
+            playedCards[i] == "Card: 2 of Spades"
+        )
+
+        {
+            cardValues[i] = 2;
+        }
+        else if (
+            playedCards[i] == "Card: 3 of Diamonds" ||
+            playedCards[i] == "Card: 3 of Clubs" ||
+            playedCards[i] == "Card: 3 of Hearts" ||
+            playedCards[i] == "Card: 3 of Spades"
+        )
+        {
+            cardValues[i] = 3;
+        }
+        else if (
+            playedCards[i] == "Card: 4 of Diamonds" ||
+            playedCards[i] == "Card: 4 of Clubs" ||
+            playedCards[i] == "Card: 4 of Hearts" ||
+            playedCards[i] == "Card: 4 of Spades"
+        )
+        {
+            cardValues[i] = 4;
+        }
+
+        else if (
+            playedCards[i] == "Card: 5 of Diamonds" ||
+            playedCards[i] == "Card: 5 of Clubs" ||
+            playedCards[i] == "Card: 5 of Hearts" ||
+            playedCards[i] == "Card: 5 of Spades"
+        )
+        {
+            cardValues[i] = 5;
+        }
+        else if (
+            playedCards[i] == "Card: 6 of Diamonds" ||
+            playedCards[i] == "Card: 6 of Clubs" ||
+            playedCards[i] == "Card: 6 of Hearts" ||
+            playedCards[i] == "Card: 6 of Spades"
+        )
+        {
+            cardValues[i] = 6;
+        }
+        else if (
+            playedCards[i] == "Card: 7 of Diamonds" ||
+            playedCards[i] == "Card: 7 of Clubs" ||
+            playedCards[i] == "Card: 7 of Hearts" ||
+            playedCards[i] == "Card: 7 of Spades"
+        )
+        {
+            cardValues[i] = 7;
+        }
+        else if (
+            playedCards[i] == "Card: 8 of Diamonds" ||
+            playedCards[i] == "Card: 8 of Clubs" ||
+            playedCards[i] == "Card: 8 of Hearts" ||
+            playedCards[i] == "Card: 8 of Spades"
+        )
+        {
+            cardValues[i] = 8;
+        }
+        else if (
+            playedCards[i] == "Card: 9 of Diamonds" ||
+            playedCards[i] == "Card: 9 of Clubs" ||
+            playedCards[i] == "Card: 9 of Hearts" ||
+            playedCards[i] == "Card: 9 of Spades"
+        )
+        {
+            cardValues[i] = 9;
+        }
+        else if (
+            playedCards[i] == "Card: 10 of Diamonds" ||
+            playedCards[i] == "Card: 10 of Clubs" ||
+            playedCards[i] == "Card: 10 of Hearts" ||
+            playedCards[i] == "Card: 10 of Spades"
+        )
+        {
+            cardValues[i] = 10;
+        }
+        else if (
+            playedCards[i] == "King (Spade)" ||
+            playedCards[i] == "King (Diamond)" ||
+            playedCards[i] == "King (Club)" ||
+            playedCards[i] == "King (Heart)"
+        )
+        {
+            cardValues[i] = 13;
+        }
+        else if (
+            playedCards[i] == "Queen (Spade)" ||
+            playedCards[i] == "Queen (Diamond)" ||
+            playedCards[i] == "Queen (Club)" ||
+            playedCards[i] == "Queen (Heart)"
+        )
+        {
+            cardValues[i] = 12;
+        }
+        else if (
+            playedCards[i] == "Jack (Spade)" ||
+            playedCards[i] == "Jack (Diamond)" ||
+            playedCards[i] == "Jack (Club)" ||
+            playedCards[i] == "Jack (Heart)"
+        )
+        {
+            cardValues[i] = 11;
+        }
+        else if (
+            playedCards[i] == "Ace (Spade)" ||
+            playedCards[i] == "Ace (Diamond)" ||
+            playedCards[i] == "Ace (Club)" ||
+            playedCards[i] == "Ace (Heart)"
+        ) {
+            cardValues[i] = 14;
+        } else {
+            cardValues[i] = 0; // fallback for unknown cards
+        }
     }
-    }
 
-    void PS4(){
-        cout << "\n   Okay, heres the punnett square:\n"<<endl;
-        cout <<" --------------------------------"<<endl;
-        cout <<"| PUNNET  |           |          |"<<endl;
-        cout <<"| SQUARE  |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<" -------------------------------- "<<endl;
-        cout <<"\n    Now here's a Phenotype for you to easily digest the information given:\n"<<endl;
-    }
+     // Find the highest value and the winner
+    int maxVal = cardValues[0];
+    int winner = 0;
+    for (int i = 1; i < numPlayers; i++) {
+        if (cardValues[i] > maxVal) {
+            maxVal = cardValues[i];
+            winner = i;
+        }
+}
 
-    void PS5(){
-        cout << "\n   Okay, heres the punnett square:\n"<<endl;
-        cout <<" --------------------------------"<<endl;
-        cout <<"| PUNNET  |           |          |"<<endl;
-        cout <<"| SQUARE  |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<" -------------------------------- "<<endl;
-        cout <<"\n    Now here's a Phenotype for you to easily digest the information given:\n"<<endl;
-
-    }
-
-    void PS6(){
-        cout << "\n   Okay, heres the punnett square:\n"<<endl;
-        cout <<" --------------------------------"<<endl;
-        cout <<"| PUNNET  |           |          |"<<endl;
-        cout <<"| SQUARE  |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|_________|___________|__________|"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<"|         |           |          |"<<endl;
-        cout <<" -------------------------------- "<<endl;
-        cout <<"\n    Now here's a Phenotype for you to easily digest the information given:\n"<<endl;
-
-    }
-
-    //DONT KEEP IN FINAL VERSION, FINISH PUNNET SQUARE AND CODE FOR FEMALE.
+       cout << "Player " << (winner + 1) << " wins the round with " << playedCards[winner] << "!" << endl;
+    return winner; // index of the winner
+}
+void OtherRounds(int numPlayers, string deck[], int playerPoints[]){
+    // Placeholder for other rounds logic
+    cout << "Other rounds logic goes here." << endl;
+    // You can implement the logic for subsequent rounds here
+}
